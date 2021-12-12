@@ -1,6 +1,7 @@
 import pygame
 from pygame import mixer
 import random
+import math
 
 pygame.init()
 mixer.init()
@@ -13,6 +14,9 @@ BG = (105, 105, 105)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 FPS = 60
+
+original_wizard1image = pygame.image.load(f'C:/Users/rijad/Desktop/laser_game/good/wizard1.png')
+original_wizard2image = pygame.image.load(f'C:/Users/rijad/Desktop/laser_game/good/wizard2.png')
 
 # MUSIC CONSTANTS
 main_menu_music = pygame.mixer.Sound('C:/Users/rijad/Desktop/laser_game/music/main_menu.mp3')
@@ -47,8 +51,9 @@ class Character(pygame.sprite.Sprite):
     def __init__(self, number, x, y, scale, speed):
         self.speed = speed
         self.scale = scale
+        self.number = number
 
-        image = pygame.image.load(f'C:/Users/rijad/Desktop/laser_game/good/{number}.png').convert_alpha()
+        image = pygame.image.load(f'C:/Users/rijad/Desktop/laser_game/good/wizard{number}.png').convert_alpha()
         self.image = pygame.transform.scale(image, (int(image.get_width() * scale), int(image.get_height() * scale)))
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
@@ -76,7 +81,23 @@ class Character(pygame.sprite.Sprite):
         self.rect.y += dy
 
     def draw(self):
-        screen.blit(self.image, self.rect)
+        if self.number == '1':
+            main = (main1.rect.center)
+            secondary = (main2.rect.center)
+        else:
+            main = (main2.rect.center)
+            secondary = (main1.rect.center)
+        ang_x, ang_y = secondary[0] - main[0], secondary[1] - main[1]
+        angle = (180 / math.pi) * -math.atan2(ang_y, ang_x) - 90
+        if self.number == '1':
+            self.image = pygame.transform.rotozoom(original_wizard1image, int(angle), 2)
+            #self.rect = self.image.get_rect(center=self.position)
+            screen.blit(self.image, self.rect)
+        else:
+            self.image = pygame.transform.rotozoom(original_wizard2image, int(angle), 2)
+            #self.rect = self.image.get_rect(center=self.position)
+            screen.blit(self.image, self.rect)
+
 
 
 class Zombie(pygame.sprite.Sprite):
@@ -117,6 +138,9 @@ class Zombie(pygame.sprite.Sprite):
 
     def draw(self):
         screen.blit(self.image, self.rect)
+
+
+
 
 
 class Shooter(pygame.sprite.Sprite):
@@ -164,8 +188,8 @@ clock = pygame.time.Clock()
 
 # Character(number, x, y, scale, speed)
 # Zombie(x, y, scale, speed)
-main1 = Character('1', 400, 400, 1, 3)
-main2 = Character('2', 600, 400, 1, 3)
+main1 = Character('1', 400, 400, 2.5, 3)
+main2 = Character('2', 600, 400, 2.5, 3)
 main = [main1, main2]
 
 run = True
