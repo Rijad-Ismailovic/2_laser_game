@@ -11,25 +11,27 @@ pygame.font.init()
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = (int)(SCREEN_WIDTH * 0.8)
 BG = (105, 105, 105)
+BG_IMAGE = pygame.image.load('C:/Users/rijad/Desktop/laser_game/bg_image.jpg')
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 FPS = 60
 
-original_wizard1image = pygame.image.load(f'C:/Users/rijad/Desktop/laser_game/good/wizard1.png')
-original_wizard2image = pygame.image.load(f'C:/Users/rijad/Desktop/laser_game/good/wizard2.png')
+original_wizard1image = pygame.image.load('C:/Users/rijad/Desktop/laser_game/good/wizard1.png')
+original_wizard2image = pygame.image.load('C:/Users/rijad/Desktop/laser_game/good/wizard2.png')
+original_zombieimage = pygame.image.load('C:/Users/rijad/Desktop/laser_game/bad/zombie.png')
 
 # MUSIC CONSTANTS
 main_menu_music = pygame.mixer.Sound('C:/Users/rijad/Desktop/laser_game/music/main_menu.mp3')
 main_menu_music.set_volume(0.01)
 # main_menu_music.play(-1, 0, 0)
 # funny_bit, retro_platforming, castle_of_fear
-music = pygame.mixer.Sound('C:/Users/rijad/Desktop/laser_game/music/castle_of_fear.mp3')
+music = pygame.mixer.Sound('C:/Users/rijad/Desktop/laser_game/music/funny_bit.mp3')
 music.set_volume(0.008)
 music.play(-1, 0, 0)
 laser_sfx = pygame.mixer.Sound('C:/Users/rijad/Desktop/laser_game/music/lasersfx.wav')
 
 # FONT CONSTANTS
-font = pygame.font.SysFont("Times New Roman", 30, False, False)
+font = pygame.font.Font('C:/Users/rijad/AppData/Local/Microsoft/Windows/Fonts/8-bit Arcade In.ttf', 100)
 
 # DISPLAY
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -90,12 +92,10 @@ class Character(pygame.sprite.Sprite):
         ang_x, ang_y = secondary[0] - main[0], secondary[1] - main[1]
         angle = (180 / math.pi) * -math.atan2(ang_y, ang_x) - 90
         if self.number == '1':
-            self.image = pygame.transform.rotozoom(original_wizard1image, int(angle), 2)
-            #self.rect = self.image.get_rect(center=self.position)
+            self.image = pygame.transform.rotozoom(original_wizard1image, int(angle), 3)
             screen.blit(self.image, self.rect)
         else:
-            self.image = pygame.transform.rotozoom(original_wizard2image, int(angle), 2)
-            #self.rect = self.image.get_rect(center=self.position)
+            self.image = pygame.transform.rotozoom(original_wizard2image, int(angle), 3)
             screen.blit(self.image, self.rect)
 
 
@@ -107,7 +107,7 @@ class Zombie(pygame.sprite.Sprite):
         self.check = 0
         self.num = main1
 
-        img = pygame.image.load('C:/Users/rijad/Desktop/laser_game/bad/1.png').convert_alpha()
+        img = pygame.image.load('C:/Users/rijad/Desktop/laser_game/bad/zombie.png').convert_alpha()
         self.image = pygame.transform.scale(img, (int(img.get_width() * scale), int(img.get_height() * scale)))
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
@@ -136,10 +136,19 @@ class Zombie(pygame.sprite.Sprite):
         if self.rect.colliderect(main1) or self.rect.colliderect(main2):
             pygame.display.quit()
 
+
     def draw(self):
+        if self.num == '1':
+            main = (zombie.rect.center)
+            secondary = (main1.rect.center)
+        else:
+            main = (zombie.rect.center)
+            secondary = (main2.rect.center)
+        print(self.num)
+        ang_x, ang_y = secondary[0] - main[0], secondary[1] - main[1]
+        angle = (180 / math.pi) * -math.atan2(ang_y, ang_x) - 90
+        self.image = pygame.transform.rotozoom(original_zombieimage, int(angle), 20)
         screen.blit(self.image, self.rect)
-
-
 
 
 
@@ -160,6 +169,7 @@ class Shooter(pygame.sprite.Sprite):
 
 def draw_bg():
     screen.fill(BG)
+    screen.blit(BG_IMAGE, (0, 0))
 
 
 def distance_point_line(pt, l1, l2):
@@ -198,7 +208,7 @@ while run:
     clock.tick(FPS)
 
     score_text = font.render(str(score), False, WHITE)
-    screen.blit(score_text, (30, 30))
+    screen.blit(score_text, (30, 1))
 
     main1.draw()
     main2.draw()
@@ -206,27 +216,25 @@ while run:
     main1.move(one_moving_left, one_moving_right, one_moving_up, one_moving_down)
     main2.move(two_moving_left, two_moving_right, two_moving_up, two_moving_down)
 
-    laser = pygame.draw.line(screen, WHITE, (main1.rect.centerx, main1.rect.centery),
-                             (main2.rect.centerx, main2.rect.centery), 6)
+    laser = pygame.draw.line(screen, WHITE, (main1.rect.centerx + 20, main1.rect.centery + 20), (main2.rect.centerx + 10, main2.rect.centery + 20), 6)
 
     # zombie
     if zombie_timer == max_zombie_timer:
         # za koliko ce enemy biti spawnan van ekrana = 10
         ran = random.randint(1, 4)
         if ran == 1:
-            zombie = Zombie((SCREEN_WIDTH + 10), (random.randint(0, SCREEN_HEIGHT)), 1, 1)
+            zombie = Zombie((SCREEN_WIDTH + 10), (random.randint(0, SCREEN_HEIGHT)), 3, 1)
         if ran == 2:
-            zombie = Zombie((random.randint(0, SCREEN_WIDTH)), (-10), 1, 1)
+            zombie = Zombie((random.randint(0, SCREEN_WIDTH)), (-10), 3, 1)
         if ran == 3:
-            zombie = Zombie((SCREEN_WIDTH - 10), (random.randint(0, SCREEN_HEIGHT)), 1, 1)
+            zombie = Zombie((SCREEN_WIDTH - 10), (random.randint(0, SCREEN_HEIGHT)), 3, 1)
         if ran == 4:
-            zombie = Zombie((random.randint(0, SCREEN_WIDTH)), (SCREEN_HEIGHT + 10), 1, 1)
+            zombie = Zombie((random.randint(0, SCREEN_WIDTH)), (SCREEN_HEIGHT + 10), 3, 1)
         zombie_group.add(zombie)
         max_zombie_timer -= 10
         zombie_timer = 0
     zombie_timer += 1
 
-    zombie_group.update()
     zombie_group.draw(screen)
     for zombie in zombie_group:
         zombie.move()
@@ -253,7 +261,6 @@ while run:
         zombie_timer = 0
     shooter_timer += 1
 
-    shooter_group.update()
     shooter_group.draw(screen)
     for shooter in shooter_group:
         shooter.move()
