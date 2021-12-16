@@ -25,7 +25,7 @@ main_menu_music = pygame.mixer.Sound('C:/Users/rijad/Desktop/laser_game/music/ma
 main_menu_music.set_volume(0.01)
 # main_menu_music.play(-1, 0, 0)
 # funny_bit, retro_platforming, castle_of_fear
-music = pygame.mixer.Sound('C:/Users/rijad/Desktop/laser_game/music/funny_bit.mp3')
+music = pygame.mixer.Sound('C:/Users/rijad/Desktop/laser_game/music/castle_of_fear.mp3')
 music.set_volume(0.008)
 music.play(-1, 0, 0)
 laser_sfx = pygame.mixer.Sound('C:/Users/rijad/Desktop/laser_game/music/lasersfx.wav')
@@ -90,7 +90,7 @@ class Character(pygame.sprite.Sprite):
             main = (main2.rect.center)
             secondary = (main1.rect.center)
         ang_x, ang_y = secondary[0] - main[0], secondary[1] - main[1]
-        angle = (180 / math.pi) * -math.atan2(ang_y, ang_x) - 90
+        angle = (180 / math.pi) * - math.atan2(ang_y, ang_x) - 90
         if self.number == '1':
             self.image = pygame.transform.rotozoom(original_wizard1image, int(angle), 3)
             screen.blit(self.image, self.rect)
@@ -105,7 +105,7 @@ class Zombie(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self, zombie_group)
         self.speed = speed
         self.check = 0
-        self.num = main1
+        self.num = random.choice(main)
 
         img = pygame.image.load('C:/Users/rijad/Desktop/laser_game/bad/zombie.png').convert_alpha()
         self.image = pygame.transform.scale(img, (int(img.get_width() * scale), int(img.get_height() * scale)))
@@ -117,8 +117,8 @@ class Zombie(pygame.sprite.Sprite):
         dy = self.speed
 
         # chase random main character
-        if self.check == 0:
-            self.num = random.choice(main)
+        """if self.check == 0:
+            self.num = random.choice(main)"""
 
         if self.rect.x > self.num.rect.x:
             self.rect.x += -dx
@@ -130,7 +130,7 @@ class Zombie(pygame.sprite.Sprite):
         else:
             self.rect.y += dy
 
-        self.check += 1
+        #self.check += 1
 
         # collision with player
         if self.rect.colliderect(main1) or self.rect.colliderect(main2):
@@ -138,19 +138,16 @@ class Zombie(pygame.sprite.Sprite):
 
 
     def draw(self):
-        if self.num == '1':
+        if self.num == main1:
             main = (zombie.rect.center)
             secondary = (main1.rect.center)
         else:
             main = (zombie.rect.center)
             secondary = (main2.rect.center)
-        print(self.num)
         ang_x, ang_y = secondary[0] - main[0], secondary[1] - main[1]
-        angle = (180 / math.pi) * -math.atan2(ang_y, ang_x) - 90
-        self.image = pygame.transform.rotozoom(original_zombieimage, int(angle), 20)
+        angle = (180 / math.pi) * -math.atan2(ang_y, ang_x) - 270
+        self.image = pygame.transform.rotozoom(original_zombieimage, int(angle), 2.5)
         screen.blit(self.image, self.rect)
-
-
 
 class Shooter(pygame.sprite.Sprite):
     def __init(self, x, y, scale, speed):
@@ -216,7 +213,7 @@ while run:
     main1.move(one_moving_left, one_moving_right, one_moving_up, one_moving_down)
     main2.move(two_moving_left, two_moving_right, two_moving_up, two_moving_down)
 
-    laser = pygame.draw.line(screen, WHITE, (main1.rect.centerx + 20, main1.rect.centery + 20), (main2.rect.centerx + 10, main2.rect.centery + 20), 6)
+    laser = pygame.draw.line(screen, WHITE, (main1.rect.centerx + 12, main1.rect.centery + 10), (main2.rect.centerx + 5, main2.rect.centery + 10), 6)
 
     # zombie
     if zombie_timer == max_zombie_timer:
@@ -238,8 +235,9 @@ while run:
     zombie_group.draw(screen)
     for zombie in zombie_group:
         zombie.move()
+        zombie.draw()
         if laser.collidepoint(zombie.rect.center) and distance_point_line(zombie.rect.center, main1.rect.center,
-                                                                          main2.rect.center) < 20:
+                                                                          main2.rect.center) < 10:
             laser_sfx.play(1, 0, 0)
             zombie.kill()
             score += 1
