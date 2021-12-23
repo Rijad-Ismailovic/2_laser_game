@@ -18,7 +18,7 @@ FPS = 60
 
 original_wizard1image = pygame.image.load('C:/Users/rijad/Desktop/laser_game/good/wizard1.png')
 original_wizard2image = pygame.image.load('C:/Users/rijad/Desktop/laser_game/good/wizard2.png')
-original_zombieimage = pygame.image.load('C:/Users/rijad/Desktop/laser_game/bad/zombie.png')
+original_zombieimage = pygame.image.load('C:/Users/rijad/Desktop/laser_game/bad/zombie1.png')
 
 # MUSIC CONSTANTS
 main_menu_music = pygame.mixer.Sound('C:/Users/rijad/Desktop/laser_game/music/main_menu.mp3')
@@ -92,10 +92,10 @@ class Character(pygame.sprite.Sprite):
         ang_x, ang_y = secondary[0] - main[0], secondary[1] - main[1]
         angle = (180 / math.pi) * - math.atan2(ang_y, ang_x) - 90
         if self.number == '1':
-            self.image = pygame.transform.rotozoom(original_wizard1image, int(angle), 3)
+            self.image = pygame.transform.rotozoom(original_wizard1image, int(angle), self.scale)
             screen.blit(self.image, self.rect)
         else:
-            self.image = pygame.transform.rotozoom(original_wizard2image, int(angle), 3)
+            self.image = pygame.transform.rotozoom(original_wizard2image, int(angle), self.scale)
             screen.blit(self.image, self.rect)
 
 
@@ -106,8 +106,9 @@ class Zombie(pygame.sprite.Sprite):
         self.speed = speed
         self.check = 0
         self.num = random.choice(main)
+        self.scale = scale
 
-        img = pygame.image.load('C:/Users/rijad/Desktop/laser_game/bad/zombie.png').convert_alpha()
+        img = pygame.image.load('C:/Users/rijad/Desktop/laser_game/bad/zombie1.png').convert_alpha()
         self.image = pygame.transform.scale(img, (int(img.get_width() * scale), int(img.get_height() * scale)))
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
@@ -146,7 +147,7 @@ class Zombie(pygame.sprite.Sprite):
             secondary = (main2.rect.center)
         ang_x, ang_y = secondary[0] - main[0], secondary[1] - main[1]
         angle = (180 / math.pi) * -math.atan2(ang_y, ang_x) - 270
-        self.image = pygame.transform.rotozoom(original_zombieimage, int(angle), 2.5)
+        self.image = pygame.transform.rotozoom(original_zombieimage, int(angle), self.scale)
         screen.blit(self.image, self.rect)
 
 class Shooter(pygame.sprite.Sprite):
@@ -194,9 +195,8 @@ score = 0
 clock = pygame.time.Clock()
 
 # Character(number, x, y, scale, speed)
-# Zombie(x, y, scale, speed)
-main1 = Character('1', 400, 400, 2.5, 3)
-main2 = Character('2', 600, 400, 2.5, 3)
+main1 = Character('1', 400, 400, 1, 3)
+main2 = Character('2', 600, 400, 1, 3)
 main = [main1, main2]
 
 run = True
@@ -213,20 +213,20 @@ while run:
     main1.move(one_moving_left, one_moving_right, one_moving_up, one_moving_down)
     main2.move(two_moving_left, two_moving_right, two_moving_up, two_moving_down)
 
-    laser = pygame.draw.line(screen, WHITE, (main1.rect.centerx + 12, main1.rect.centery + 10), (main2.rect.centerx + 5, main2.rect.centery + 10), 6)
+    laser = pygame.draw.line(screen, WHITE, (main1.rect.centerx + 12, main1.rect.centery + 10), (main2.rect.centerx - 25, main2.rect.centery + 10), 6)
 
-    # zombie
+    # Zombie(x, y, scale, speed)
     if zombie_timer == max_zombie_timer:
         # za koliko ce enemy biti spawnan van ekrana = 10
         ran = random.randint(1, 4)
         if ran == 1:
-            zombie = Zombie((SCREEN_WIDTH + 10), (random.randint(0, SCREEN_HEIGHT)), 3, 1)
+            zombie = Zombie((SCREEN_WIDTH + 10), (random.randint(0, SCREEN_HEIGHT)), 0.8, 1)
         if ran == 2:
-            zombie = Zombie((random.randint(0, SCREEN_WIDTH)), (-10), 3, 1)
+            zombie = Zombie((random.randint(0, SCREEN_WIDTH)), (-10), 0.8, 1)
         if ran == 3:
-            zombie = Zombie((SCREEN_WIDTH - 10), (random.randint(0, SCREEN_HEIGHT)), 3, 1)
+            zombie = Zombie((SCREEN_WIDTH - 10), (random.randint(0, SCREEN_HEIGHT)), 0.8, 1)
         if ran == 4:
-            zombie = Zombie((random.randint(0, SCREEN_WIDTH)), (SCREEN_HEIGHT + 10), 3, 1)
+            zombie = Zombie((random.randint(0, SCREEN_WIDTH)), (SCREEN_HEIGHT + 10), 0.8, 1)
         zombie_group.add(zombie)
         max_zombie_timer -= 10
         zombie_timer = 0
