@@ -11,14 +11,14 @@ pygame.font.init()
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = (int)(SCREEN_WIDTH * 0.8)
 BG = (105, 105, 105)
-BG_IMAGE = pygame.image.load('C:/Users/rijad/Desktop/laser_game/bg_image.jpg')
+BG_IMAGE = pygame.image.load('C:/Users/rijad/Desktop/laser_game/misc/bg_image.jpg')
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 FPS = 60
 
 original_wizard1image = pygame.image.load('C:/Users/rijad/Desktop/laser_game/good/wizard1.png')
 original_wizard2image = pygame.image.load('C:/Users/rijad/Desktop/laser_game/good/wizard2.png')
-original_zombieimage = pygame.image.load('C:/Users/rijad/Desktop/laser_game/bad/zombie1.png')
+original_zombieimage = pygame.image.load('C:/Users/rijad/Desktop/laser_game/bad/zombie.png')
 
 # MUSIC CONSTANTS
 main_menu_music = pygame.mixer.Sound('C:/Users/rijad/Desktop/laser_game/music/main_menu.mp3')
@@ -108,7 +108,7 @@ class Zombie(pygame.sprite.Sprite):
         self.num = random.choice(main)
         self.scale = scale
 
-        img = pygame.image.load('C:/Users/rijad/Desktop/laser_game/bad/zombie1.png').convert_alpha()
+        img = pygame.image.load('C:/Users/rijad/Desktop/laser_game/bad/zombie.png').convert_alpha()
         self.image = pygame.transform.scale(img, (int(img.get_width() * scale), int(img.get_height() * scale)))
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
@@ -169,6 +169,13 @@ def draw_bg():
     screen.fill(BG)
     screen.blit(BG_IMAGE, (0, 0))
 
+def draw_tutorial():
+    wasd_blue = pygame.image.load('C:/Users/rijad/Desktop/laser_game/misc/wasd.png')
+    wasd_red = pygame.image.load('C:/Users/rijad/Desktop/laser_game/misc/arrowkeys.png')
+    wasd_blue = pygame.transform.scale(wasd_blue, (wasd_blue.get_width() * 0.3, wasd_blue.get_height() * 0.3))
+    wasd_red = pygame.transform.scale(wasd_red, (wasd_red.get_width() * 0.3, wasd_red.get_height() * 0.3))
+    screen.blit(wasd_blue, (main1.rect.centerx - 55, main1.rect.centery - 100))
+    screen.blit(wasd_red, (main2.rect.centerx - 55, main2.rect.centery - 100))
 
 def distance_point_line(pt, l1, l2):
     NV = pygame.math.Vector2(l1[1] - l2[1], l2[0] - l1[0])
@@ -189,8 +196,9 @@ zombie_timer = 0  # 5 sekundi jer 300/FPS = 5, FPS = 60
 max_shooter_timer = 480
 shooter_timer = 0
 score = 0
+tutorial_timer = 300
 
-# MAIN
+# ----------------------------------------------------- MAIN ----------------------------------------------------------
 
 clock = pygame.time.Clock()
 
@@ -203,6 +211,11 @@ run = True
 while run:
     draw_bg()
     clock.tick(FPS)
+
+    if tutorial_timer > 0:
+        draw_tutorial()
+    tutorial_timer -= 1
+
 
     score_text = font.render(str(score), False, WHITE)
     screen.blit(score_text, (30, 1))
