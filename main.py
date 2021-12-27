@@ -249,6 +249,8 @@ def game():
                 pygame.quit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
+                    music.stop()
+                    main_menu_music.play(-1, 0, 0)
                     run = False
 
             # keyboard presses
@@ -317,6 +319,7 @@ def main_menu():
             screen.blit(button_play_hover, (100, 400))
             if click:
                 game()
+                click = False
         screen.blit(button_exit, (550, 400))
         button_exit_rect = pygame.Rect(550, 400, 350, 100)
         if button_exit_rect.collidepoint((mx, my)):
