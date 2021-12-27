@@ -172,6 +172,7 @@ shooter_group = pygame.sprite.Group()
 bullet_group = pygame.sprite.Group()
 tank_group = pygame.sprite.Group()
 
+
 # ----------------------------------------------------- MAIN ----------------------------------------------------------
 
 clock = pygame.time.Clock()
