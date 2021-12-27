@@ -22,13 +22,12 @@ original_zombieimage = pygame.image.load('C:/Users/rijad/Desktop/laser_game/bad/
 
 # MUSIC CONSTANTS
 main_menu_music = pygame.mixer.Sound('C:/Users/rijad/Desktop/laser_game/music/main_menu.mp3')
-main_menu_music.set_volume(0.01)
-# main_menu_music.play(-1, 0, 0)
+main_menu_music.set_volume(1)
 # funny_bit, retro_platforming, castle_of_fear
-music = pygame.mixer.Sound('C:/Users/rijad/Desktop/laser_game/music/castle_of_fear.mp3')
-music.set_volume(0.008)
-music.play(-1, 0, 0)
+music = pygame.mixer.Sound('C:/Users/rijad/Desktop/laser_game/music/funny_bit.mp3')
+music.set_volume(0.7)
 laser_sfx = pygame.mixer.Sound('C:/Users/rijad/Desktop/laser_game/music/lasersfx.wav')
+laser_sfx.set_volume(0.5)
 
 # FONT CONSTANTS
 font = pygame.font.Font('C:/Users/rijad/AppData/Local/Microsoft/Windows/Fonts/8-bit Arcade In.ttf', 100)
@@ -117,10 +116,6 @@ class Zombie(pygame.sprite.Sprite):
         dx = self.speed
         dy = self.speed
 
-        # chase random main character
-        """if self.check == 0:
-            self.num = random.choice(main)"""
-
         if self.rect.x > self.num.rect.x:
             self.rect.x += -dx
         else:
@@ -140,29 +135,15 @@ class Zombie(pygame.sprite.Sprite):
 
     def draw(self):
         if self.num == main1:
-            main = (zombie.rect.center)
+            main = (self.rect.center)
             secondary = (main1.rect.center)
         else:
-            main = (zombie.rect.center)
+            main = (self.rect.center)
             secondary = (main2.rect.center)
         ang_x, ang_y = secondary[0] - main[0], secondary[1] - main[1]
         angle = (180 / math.pi) * -math.atan2(ang_y, ang_x) - 270
         self.image = pygame.transform.rotozoom(original_zombieimage, int(angle), self.scale)
         screen.blit(self.image, self.rect)
-
-class Shooter(pygame.sprite.Sprite):
-    def __init(self, x, y, scale, speed):
-        pygame.sprite.Sprite.__init__(self, zombie_group)
-        self.speed = speed
-
-        img = pygame.image.load('C:/Users/rijad/Desktop/laser_game/bad/2.png').convert_alpha()
-        self.image = pygame.transform.scale(img, (int(img.get_width() * scale), int(img.get_height() * scale)))
-        self.rect = self.image.get_rect()
-        self.rect.center = (x, y)
-
-    def move(self):
-        dx = self.speed
-        dy = self.speed
 
 
 def draw_bg():
@@ -191,142 +172,170 @@ shooter_group = pygame.sprite.Group()
 bullet_group = pygame.sprite.Group()
 tank_group = pygame.sprite.Group()
 
-max_zombie_timer = 300
-zombie_timer = 0  # 5 sekundi jer 300/FPS = 5, FPS = 60
-max_shooter_timer = 480
-shooter_timer = 0
-score = 0
-tutorial_timer = 300
-
 # ----------------------------------------------------- MAIN ----------------------------------------------------------
 
 clock = pygame.time.Clock()
+click = False
 
 # Character(number, x, y, scale, speed)
 main1 = Character('1', 400, 400, 1, 3)
 main2 = Character('2', 600, 400, 1, 3)
 main = [main1, main2]
 
-run = True
-while run:
-    draw_bg()
-    clock.tick(FPS)
+def game():
+    max_zombie_timer = 300
+    zombie_timer = 0  # 5 sekundi jer 300/FPS = 5, FPS = 60
+    score = 0
+    tutorial_timer = 300
 
-    if tutorial_timer > 0:
-        draw_tutorial()
-    tutorial_timer -= 1
+    global one_moving_left, one_moving_right, one_moving_up, one_moving_down
+    global two_moving_left, two_moving_right, two_moving_up, two_moving_down
+
+    main_menu_music.stop()
+    music.play(-1, 0, 0)
+
+    run = True
+    while run:
+        clock.tick(FPS)
+        draw_bg()
+
+        if tutorial_timer > 0:
+            draw_tutorial()
+        tutorial_timer -= 1
+
+        score_text = font.render(str(score), False, WHITE)
+        screen.blit(score_text, (30, 1))
+
+        main1.draw()
+        main2.draw()
+
+        main1.move(one_moving_left, one_moving_right, one_moving_up, one_moving_down)
+        main2.move(two_moving_left, two_moving_right, two_moving_up, two_moving_down)
+
+        laser = pygame.draw.line(screen, WHITE, (main1.rect.centerx + 12, main1.rect.centery + 10),
+                                 (main2.rect.centerx - 25, main2.rect.centery + 10), 6)
+
+        # Zombie(x, y, scale, speed)
+        if zombie_timer == max_zombie_timer:
+            # za koliko ce enemy biti spawnan van ekrana = 10
+            ran = random.randint(1, 4)
+            if ran == 1:
+                zombie = Zombie((SCREEN_WIDTH + 10), (random.randint(0, SCREEN_HEIGHT)), 0.8, 1)
+            if ran == 2:
+                zombie = Zombie((random.randint(0, SCREEN_WIDTH)), (-10), 0.8, 1)
+            if ran == 3:
+                zombie = Zombie((SCREEN_WIDTH - 10), (random.randint(0, SCREEN_HEIGHT)), 0.8, 1)
+            if ran == 4:
+                zombie = Zombie((random.randint(0, SCREEN_WIDTH)), (SCREEN_HEIGHT + 10), 0.8, 1)
+            zombie_group.add(zombie)
+            max_zombie_timer -= 10
+            zombie_timer = 0
+        zombie_timer += 1
+
+        zombie_group.draw(screen)
+        for zombie in zombie_group:
+            zombie.move()
+            zombie.draw()
+            if laser.collidepoint(zombie.rect.center) and distance_point_line(zombie.rect.center, main1.rect.center,
+                                                                              main2.rect.center) < 10:
+                laser_sfx.play(1, 0, 0)
+                zombie.kill()
+                score += 1
+
+        # quit
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    run = False
+
+            # keyboard presses
+
+            if event.type == pygame.KEYDOWN:
+                # movement
+                if event.key == pygame.K_a:
+                    one_moving_left = True
+                if event.key == pygame.K_d:
+                    one_moving_right = True
+                if event.key == pygame.K_w:
+                    one_moving_up = True
+                if event.key == pygame.K_s:
+                    one_moving_down = True
+
+                if event.key == pygame.K_LEFT:
+                    two_moving_left = True
+                if event.key == pygame.K_RIGHT:
+                    two_moving_right = True
+                if event.key == pygame.K_UP:
+                    two_moving_up = True
+                if event.key == pygame.K_DOWN:
+                    two_moving_down = True
+
+            if event.type == pygame.KEYUP:
+                # -movement
+                if event.key == pygame.K_a:
+                    one_moving_left = False
+                if event.key == pygame.K_d:
+                    one_moving_right = False
+                if event.key == pygame.K_w:
+                    one_moving_up = False
+                if event.key == pygame.K_s:
+                    one_moving_down = False
+
+                if event.key == pygame.K_LEFT:
+                    two_moving_left = False
+                if event.key == pygame.K_RIGHT:
+                    two_moving_right = False
+                if event.key == pygame.K_UP:
+                    two_moving_up = False
+                if event.key == pygame.K_DOWN:
+                    two_moving_down = False
+
+        pygame.display.update()
+
+def main_menu():
+    main_menu_music.play(-1, 0, 0)
+    button_play = pygame.image.load('C:/Users/rijad/Desktop/laser_game/misc/button_play.png')
+    button_play_hover = pygame.image.load('C:/Users/rijad/Desktop/laser_game/misc/button_play_hover.png')
+    button_exit = pygame.image.load('C:/Users/rijad/Desktop/laser_game/misc/button_exit.png')
+    button_exit_hover = pygame.image.load('C:/Users/rijad/Desktop/laser_game/misc/button_exit_hover.png')
+    while True:
+        clock.tick(FPS)
+        draw_bg()
+        global click
+
+        mx, my = pygame.mouse.get_pos()
+
+        logo = pygame.image.load('C:/Users/rijad/Desktop/laser_game/misc/logo.png')
+        screen.blit(logo, (100, 200))
+
+        screen.blit(button_play, (100, 400))
+        button_play_rect = pygame.Rect(100, 400, 350, 100)
+        if button_play_rect.collidepoint((mx, my)):
+            screen.blit(button_play_hover, (100, 400))
+            if click:
+                game()
+        screen.blit(button_exit, (550, 400))
+        button_exit_rect = pygame.Rect(550, 400, 350, 100)
+        if button_exit_rect.collidepoint((mx, my)):
+            screen.blit(button_exit_hover, (550, 400))
+            if click:
+                pygame.exit()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
+
+        pygame.display.update()
+
+main_menu()
 
 
-    score_text = font.render(str(score), False, WHITE)
-    screen.blit(score_text, (30, 1))
 
-    main1.draw()
-    main2.draw()
-
-    main1.move(one_moving_left, one_moving_right, one_moving_up, one_moving_down)
-    main2.move(two_moving_left, two_moving_right, two_moving_up, two_moving_down)
-
-    laser = pygame.draw.line(screen, WHITE, (main1.rect.centerx + 12, main1.rect.centery + 10), (main2.rect.centerx - 25, main2.rect.centery + 10), 6)
-
-    # Zombie(x, y, scale, speed)
-    if zombie_timer == max_zombie_timer:
-        # za koliko ce enemy biti spawnan van ekrana = 10
-        ran = random.randint(1, 4)
-        if ran == 1:
-            zombie = Zombie((SCREEN_WIDTH + 10), (random.randint(0, SCREEN_HEIGHT)), 0.8, 1)
-        if ran == 2:
-            zombie = Zombie((random.randint(0, SCREEN_WIDTH)), (-10), 0.8, 1)
-        if ran == 3:
-            zombie = Zombie((SCREEN_WIDTH - 10), (random.randint(0, SCREEN_HEIGHT)), 0.8, 1)
-        if ran == 4:
-            zombie = Zombie((random.randint(0, SCREEN_WIDTH)), (SCREEN_HEIGHT + 10), 0.8, 1)
-        zombie_group.add(zombie)
-        max_zombie_timer -= 10
-        zombie_timer = 0
-    zombie_timer += 1
-
-    zombie_group.draw(screen)
-    for zombie in zombie_group:
-        zombie.move()
-        zombie.draw()
-        if laser.collidepoint(zombie.rect.center) and distance_point_line(zombie.rect.center, main1.rect.center,
-                                                                          main2.rect.center) < 10:
-            laser_sfx.play(1, 0, 0)
-            zombie.kill()
-            score += 1
-
-    #shooter
-    """shooter_timer == max_shooter_timer:
-        ran = random.randint(1, 4)
-        if ran == 1:
-            shooter = Shooter((SCREEN_WIDTH + 10), (random.randint(0, SCREEN_HEIGHT)), 1, 1)
-        if ran == 2:
-            shooter = Shooter((random.randint(0, SCREEN_WIDTH)), (-10), 1, 1)
-        if ran == 3:
-            shooter = Shooter((SCREEN_WIDTH - 10), (random.randint(0, SCREEN_HEIGHT)), 1, 1)
-        if ran == 4:
-            shooter = Shooter((random.randint(0, SCREEN_WIDTH)), (SCREEN_HEIGHT + 10), 1, 1)
-
-        shooter_group.add(shooter)
-        max_shooter_timer -= 5
-        zombie_timer = 0
-    shooter_timer += 1
-
-    shooter_group.draw(screen)
-    for shooter in shooter_group:
-        shooter.move()
-        if laser.collidepoint(zombie.rect.center) and distance_point_line(shooter.rect.center, main1.rect.center, main2.rect.center) < 5:
-            shooter.kill()
-            score += 1"""
-
-    # quit
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                run = False
-
-        # keyboard presses
-
-        if event.type == pygame.KEYDOWN:
-            # movement
-            if event.key == pygame.K_a:
-                one_moving_left = True
-            if event.key == pygame.K_d:
-                one_moving_right = True
-            if event.key == pygame.K_w:
-                one_moving_up = True
-            if event.key == pygame.K_s:
-                one_moving_down = True
-
-            if event.key == pygame.K_LEFT:
-                two_moving_left = True
-            if event.key == pygame.K_RIGHT:
-                two_moving_right = True
-            if event.key == pygame.K_UP:
-                two_moving_up = True
-            if event.key == pygame.K_DOWN:
-                two_moving_down = True
-
-        if event.type == pygame.KEYUP:
-            # -movement
-            if event.key == pygame.K_a:
-                one_moving_left = False
-            if event.key == pygame.K_d:
-                one_moving_right = False
-            if event.key == pygame.K_w:
-                one_moving_up = False
-            if event.key == pygame.K_s:
-                one_moving_down = False
-
-            if event.key == pygame.K_LEFT:
-                two_moving_left = False
-            if event.key == pygame.K_RIGHT:
-                two_moving_right = False
-            if event.key == pygame.K_UP:
-                two_moving_up = False
-            if event.key == pygame.K_DOWN:
-                two_moving_down = False
-
-    pygame.display.update()
