@@ -165,6 +165,18 @@ def distance_point_line(pt, l1, l2):
     return abs(
         NV.normalize().dot(P - LP))  # dot je mnozenje vektora sa skalarom. P-LP je smjer koji main1 ima prema zombie
 
+def fade(width, height, button_play, button_exit, logo):
+    fade = pygame.Surface((width, height))
+    fade.fill((0,0,0))
+    for alpha in range(300):
+        fade.set_alpha(alpha)
+        draw_bg()
+        screen.blit(button_play, (100, 400))
+        screen.blit(button_exit, (550, 400))
+        screen.blit(logo, (100, 200))
+        screen.blit(fade, (0,0))
+        pygame.display.update()
+        pygame.time.delay(1)
 
 # GROUPS
 zombie_group = pygame.sprite.Group()
@@ -177,6 +189,7 @@ tank_group = pygame.sprite.Group()
 
 clock = pygame.time.Clock()
 click = False
+musicB = True
 
 # Character(number, x, y, scale, speed)
 main1 = Character('1', 400, 400, 1, 3)
@@ -213,8 +226,8 @@ def game():
         main1.move(one_moving_left, one_moving_right, one_moving_up, one_moving_down)
         main2.move(two_moving_left, two_moving_right, two_moving_up, two_moving_down)
 
-        laser = pygame.draw.line(screen, WHITE, (main1.rect.centerx + 12, main1.rect.centery + 10),
-                                 (main2.rect.centerx - 25, main2.rect.centery + 10), 6)
+        laser = pygame.draw.line(screen, WHITE, (main1.rect.centerx + 12, main1.rect.centery + 10), (main2.rect.centerx - 25, main2.rect.centery + 10), 6)
+
 
         # Zombie(x, y, scale, speed)
         if zombie_timer == max_zombie_timer:
@@ -306,7 +319,7 @@ def main_menu():
     while True:
         clock.tick(FPS)
         draw_bg()
-        global click
+        global click, musicB
 
         mx, my = pygame.mouse.get_pos()
 
@@ -318,14 +331,16 @@ def main_menu():
         if button_play_rect.collidepoint((mx, my)):
             screen.blit(button_play_hover, (100, 400))
             if click:
+                main_menu_music.fadeout(2000)
+                fade(SCREEN_WIDTH, SCREEN_HEIGHT, button_play, button_exit, logo)
                 game()
-                click = False
         screen.blit(button_exit, (550, 400))
         button_exit_rect = pygame.Rect(550, 400, 350, 100)
         if button_exit_rect.collidepoint((mx, my)):
             screen.blit(button_exit_hover, (550, 400))
             if click:
                 pygame.exit()
+        click = False
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
