@@ -11,30 +11,34 @@ pygame.font.init()
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = (int)(SCREEN_WIDTH * 0.8)
 BG = (105, 105, 105)
-BG_IMAGE = pygame.image.load('C:/Users/rijad/Desktop/laser_game/misc/bg_image.jpg')
+BG_IMAGE = pygame.image.load('misc/bg_image.jpg')
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 FPS = 60
 
-original_wizard1image = pygame.image.load('C:/Users/rijad/Desktop/laser_game/good/wizard1.png')
-original_wizard2image = pygame.image.load('C:/Users/rijad/Desktop/laser_game/good/wizard2.png')
-original_zombieimage = pygame.image.load('C:/Users/rijad/Desktop/laser_game/bad/zombie.png')
+#ICON
+programIcon = pygame.image.load('misc/icon.png')
+pygame.display.set_icon(programIcon)
+
+original_wizard1image = pygame.image.load('good/wizard1.png')
+original_wizard2image = pygame.image.load('good/wizard2.png')
+original_zombieimage = pygame.image.load('bad/zombie.png')
 
 # MUSIC CONSTANTS
-main_menu_music = pygame.mixer.Sound('C:/Users/rijad/Desktop/laser_game/music/main_menu.mp3')
+main_menu_music = pygame.mixer.Sound('music/main_menu.mp3')
 main_menu_music.set_volume(1)
 # funny_bit, retro_platforming, castle_of_fear
-music = pygame.mixer.Sound('C:/Users/rijad/Desktop/laser_game/music/funny_bit.mp3')
+music = pygame.mixer.Sound('music/funny_bit.mp3')
 music.set_volume(0.7)
-laser_sfx = pygame.mixer.Sound('C:/Users/rijad/Desktop/laser_game/music/lasersfx.wav')
+laser_sfx = pygame.mixer.Sound('music/lasersfx.wav')
 laser_sfx.set_volume(0.5)
 
 # FONT CONSTANTS
-font = pygame.font.Font('C:/Users/rijad/AppData/Local/Microsoft/Windows/Fonts/8-bit Arcade In.ttf', 100)
+font = pygame.font.Font('misc/8-bit Arcade In.ttf', 100)
 
 # DISPLAY
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("2_laser_game")
+pygame.display.set_caption("Laser-Bound")
 
 # DEFINE PLAYER ACTION VARIBALES
 one_moving_left = False
@@ -54,7 +58,7 @@ class Character(pygame.sprite.Sprite):
         self.scale = scale
         self.number = number
 
-        image = pygame.image.load(f'C:/Users/rijad/Desktop/laser_game/good/wizard{number}.png').convert_alpha()
+        image = pygame.image.load(f'good/wizard{number}.png').convert_alpha()
         self.image = pygame.transform.scale(image, (int(image.get_width() * scale), int(image.get_height() * scale)))
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
@@ -107,7 +111,7 @@ class Zombie(pygame.sprite.Sprite):
         self.num = random.choice(main)
         self.scale = scale
 
-        img = pygame.image.load('C:/Users/rijad/Desktop/laser_game/bad/zombie.png').convert_alpha()
+        img = pygame.image.load('bad/zombie.png').convert_alpha()
         self.image = pygame.transform.scale(img, (int(img.get_width() * scale), int(img.get_height() * scale)))
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
@@ -151,8 +155,8 @@ def draw_bg():
     screen.blit(BG_IMAGE, (0, 0))
 
 def draw_tutorial():
-    wasd_blue = pygame.image.load('C:/Users/rijad/Desktop/laser_game/misc/wasd.png')
-    wasd_red = pygame.image.load('C:/Users/rijad/Desktop/laser_game/misc/arrowkeys.png')
+    wasd_blue = pygame.image.load('misc/wasd.png')
+    wasd_red = pygame.image.load('misc/arrowkeys.png')
     wasd_blue = pygame.transform.scale(wasd_blue, (wasd_blue.get_width() * 0.3, wasd_blue.get_height() * 0.3))
     wasd_red = pygame.transform.scale(wasd_red, (wasd_red.get_width() * 0.3, wasd_red.get_height() * 0.3))
     screen.blit(wasd_blue, (main1.rect.centerx - 55, main1.rect.centery - 100))
@@ -312,10 +316,10 @@ def game():
 
 def main_menu():
     main_menu_music.play(-1, 0, 0)
-    button_play = pygame.image.load('C:/Users/rijad/Desktop/laser_game/misc/button_play.png')
-    button_play_hover = pygame.image.load('C:/Users/rijad/Desktop/laser_game/misc/button_play_hover.png')
-    button_exit = pygame.image.load('C:/Users/rijad/Desktop/laser_game/misc/button_exit.png')
-    button_exit_hover = pygame.image.load('C:/Users/rijad/Desktop/laser_game/misc/button_exit_hover.png')
+    button_play = pygame.image.load('misc/button_play.png')
+    button_play_hover = pygame.image.load('misc/button_play_hover.png')
+    button_exit = pygame.image.load('misc/button_exit.png')
+    button_exit_hover = pygame.image.load('misc/button_exit_hover.png')
     while True:
         clock.tick(FPS)
         draw_bg()
@@ -323,7 +327,7 @@ def main_menu():
 
         mx, my = pygame.mouse.get_pos()
 
-        logo = pygame.image.load('C:/Users/rijad/Desktop/laser_game/misc/logo.png')
+        logo = pygame.image.load('misc/logo.png')
         screen.blit(logo, (100, 200))
 
         screen.blit(button_play, (100, 400))
