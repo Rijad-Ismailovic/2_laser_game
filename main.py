@@ -134,7 +134,8 @@ class Zombie(pygame.sprite.Sprite):
 
         # collision with player
         if self.rect.colliderect(main1) or self.rect.colliderect(main2):
-            pygame.display.quit()
+            gameover()
+            #pygame.display.quit()
 
 
     def draw(self):
@@ -182,12 +183,30 @@ def fade(width, height, button_play, button_exit, logo):
         pygame.display.update()
         pygame.time.delay(1)
 
+def gameover():
+    #score_text = font.render(f"Score: {score} ", True, (WHITE))
+    #screen.blit(score_text, (500, 300))
+
+    gameover = True
+    while gameover:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r:
+                    for zombie in zombie_group:
+                        zombie.kill()
+                        gameover = False
+                    gameover = False
+                if event.key == pygame.K_x:
+                    pygame.quit()
+
+    game()
+    pygame.display.update()
+
 # GROUPS
 zombie_group = pygame.sprite.Group()
-shooter_group = pygame.sprite.Group()
-bullet_group = pygame.sprite.Group()
-tank_group = pygame.sprite.Group()
-
 
 # ----------------------------------------------------- MAIN ----------------------------------------------------------
 
