@@ -34,7 +34,8 @@ laser_sfx = pygame.mixer.Sound('music/lasersfx.wav')
 laser_sfx.set_volume(0.5)
 
 # FONT CONSTANTS
-font = pygame.font.Font('misc/8-bit Arcade In.ttf', 100)
+font_score = pygame.font.Font('misc/8-bit Arcade In.ttf', 100)
+font = pygame.font.Font('misc/8-bit Arcade In.ttf', 35)
 
 # DISPLAY
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -172,7 +173,7 @@ def distance_point_line(pt, l1, l2):
 
 def fade(width, height, button_play, button_exit, logo):
     fade = pygame.Surface((width, height))
-    fade.fill((0,0,0))
+    fade.fill((0, 0, 0))
     for alpha in range(300):
         fade.set_alpha(alpha)
         draw_bg()
@@ -184,9 +185,7 @@ def fade(width, height, button_play, button_exit, logo):
         pygame.time.delay(1)
 
 def gameover():
-    #score_text = font.render(f"Score: {score} ", True, (WHITE))
-    #screen.blit(score_text, (500, 300))
-
+    help_text = font.render("Press r for RESTART  Press x for EXIT", True, WHITE)
     gameover = True
     while gameover:
         for event in pygame.event.get():
@@ -197,13 +196,39 @@ def gameover():
                 if event.key == pygame.K_r:
                     for zombie in zombie_group:
                         zombie.kill()
-                        gameover = False
                     gameover = False
                 if event.key == pygame.K_x:
                     pygame.quit()
 
+        screen.blit(help_text, (200, 200))
+        pygame.display.update()
+
     game()
-    pygame.display.update()
+
+def pause():
+    global one_moving_left, one_moving_right, one_moving_up, one_moving_down
+    global two_moving_left, two_moving_right, two_moving_up, two_moving_down
+
+    help_text = font.render("PAUSED", True, WHITE)
+    pause = True
+    while pause:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    one_moving_up = False
+                    one_moving_down = False
+                    one_moving_left = False
+                    one_moving_right = False
+                    two_moving_up = False
+                    two_moving_down = False
+                    two_moving_left = False
+                    two_moving_right = False
+                    pause = False
+        screen.blit(help_text, (440, 200))
+        pygame.display.update()
 
 # GROUPS
 zombie_group = pygame.sprite.Group()
@@ -227,6 +252,22 @@ def game():
 
     global one_moving_left, one_moving_right, one_moving_up, one_moving_down
     global two_moving_left, two_moving_right, two_moving_up, two_moving_down
+    one_moving_up = False
+    one_moving_down = False
+    one_moving_left = False
+    one_moving_right = False
+    two_moving_up = False
+    two_moving_down = False
+    two_moving_left = False
+    two_moving_right = False
+
+    global main1, main2
+    global main
+    main1 = Character('1', 400, 400, 1, 3)
+    main2 = Character('2', 600, 400, 1, 3)
+    main = [main1, main2]
+
+    first_time = True
 
     main_menu_music.stop()
     music.play(-1, 0, 0)
@@ -236,11 +277,14 @@ def game():
         clock.tick(FPS)
         draw_bg()
 
-        if tutorial_timer > 0:
-            draw_tutorial()
+        if first_time:
+            if tutorial_timer > 0:
+                draw_tutorial()
+        if tutorial_timer == 0:
+            first_time = False
         tutorial_timer -= 1
 
-        score_text = font.render(str(score), False, WHITE)
+        score_text = font_score.render(str(score), False, WHITE)
         screen.blit(score_text, (30, 1))
 
         main1.draw()
@@ -283,11 +327,6 @@ def game():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    music.stop()
-                    main_menu_music.play(-1, 0, 0)
-                    run = False
 
             # keyboard presses
 
@@ -310,6 +349,9 @@ def game():
                     two_moving_up = True
                 if event.key == pygame.K_DOWN:
                     two_moving_down = True
+
+                if event.key == pygame.K_ESCAPE:
+                    pause()
 
             if event.type == pygame.KEYUP:
                 # -movement
@@ -368,14 +410,12 @@ def main_menu():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    pygame.quit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
 
         pygame.display.update()
+
 
 main_menu()
 
