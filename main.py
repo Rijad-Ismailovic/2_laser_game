@@ -36,6 +36,7 @@ laser_sfx.set_volume(0.5)
 # FONT CONSTANTS
 font_score = pygame.font.Font('misc/8-bit Arcade In.ttf', 100)
 font = pygame.font.Font('misc/8-bit Arcade In.ttf', 35)
+font_gameover = pygame.font.Font('misc/8-bit Arcade In.ttf', 200)
 
 # DISPLAY
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -185,22 +186,47 @@ def fade(width, height, button_play, button_exit, logo):
         pygame.time.delay(1)
 
 def gameover():
-    help_text = font.render("Press r for RESTART  Press x for EXIT", True, WHITE)
+    score_text = font_gameover.render(str(getScore()), False, WHITE)
+    highscore_text = font_gameover.render(str(getHighscore()), False, WHITE)
+    gameover_menu = pygame.image.load("misc/gameover_img.png")
+    button_restart = pygame.image.load("ui/button_restart.png")
+    button_restart_hover = pygame.image.load("ui/button_restart_hover.png")
+    button_exit = pygame.image.load("ui/button_gameover_exit.png")
+    button_exit_hover = pygame.image.load("ui/button_gameover_exit_hover.png")
+
+    global click
+
+    screen.blit(gameover_menu, (250, 100))
+    screen.blit(score_text, (335, 365))
+    screen.blit(highscore_text, (570, 365))
+
     gameover = True
     while gameover:
+        mx, my = pygame.mouse.get_pos()
+
+        screen.blit(button_restart, (285, 550))
+        button_restart_rect = pygame.Rect(285, 550, 230, 90)
+        if button_restart_rect.collidepoint((mx, my)):
+            screen.blit(button_restart_hover, (285, 550))
+            if click:
+                for zombie in zombie_group:
+                    zombie.kill()
+                gameover = False
+        screen.blit(button_exit, (550, 550))
+        button_exit_rect = pygame.Rect(550, 550, 148, 90)
+        if button_exit_rect.collidepoint((mx, my)):
+            screen.blit(button_exit_hover, (550, 550))
+            if click:
+                pygame.exit()
+        click = False
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
 
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_r:
-                    for zombie in zombie_group:
-                        zombie.kill()
-                    gameover = False
-                if event.key == pygame.K_x:
-                    pygame.quit()
-
-        screen.blit(help_text, (200, 200))
         pygame.display.update()
 
     game()
@@ -232,6 +258,21 @@ def pause():
 
 # GROUPS
 zombie_group = pygame.sprite.Group()
+
+score = 0
+highscore = 0
+def setScore():
+    global score
+    score += 1
+def getScore():
+    global score
+    return score
+
+def getHighscore():
+    global score, highscore
+    if score > highscore:
+        highscore = score
+    return highscore
 
 # ----------------------------------------------------- MAIN ----------------------------------------------------------
 
@@ -321,6 +362,7 @@ def game():
                                                                               main2.rect.center) < 10:
                 laser_sfx.play(1, 0, 0)
                 zombie.kill()
+                setScore()
                 score += 1
 
         # quit
@@ -377,10 +419,10 @@ def game():
 
 def main_menu():
     main_menu_music.play(-1, 0, 0)
-    button_play = pygame.image.load('misc/button_play.png')
-    button_play_hover = pygame.image.load('misc/button_play_hover.png')
-    button_exit = pygame.image.load('misc/button_exit.png')
-    button_exit_hover = pygame.image.load('misc/button_exit_hover.png')
+    button_play = pygame.image.load('ui/button_play.png')
+    button_play_hover = pygame.image.load('ui/button_play_hover.png')
+    button_exit = pygame.image.load('ui/button_exit.png')
+    button_exit_hover = pygame.image.load('ui/button_exit_hover.png')
     while True:
         clock.tick(FPS)
         draw_bg()
@@ -418,6 +460,3 @@ def main_menu():
 
 
 main_menu()
-
-
-
