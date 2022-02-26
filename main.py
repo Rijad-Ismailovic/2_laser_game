@@ -228,17 +228,18 @@ def gameover():
                     click = True
 
         pygame.display.update()
-
+    music.stop()
     game()
 
 def pause():
     global one_moving_left, one_moving_right, one_moving_up, one_moving_down
     global two_moving_left, two_moving_right, two_moving_up, two_moving_down
 
-    help_text = font.render("PAUSED", True, WHITE)
     paused_img = pygame.image.load("misc/paused_img.png")
     screen.blit(paused_img, (0, 0))
-    
+
+    music.set_volume(0.2)
+
     pause = True
     while pause:
         for event in pygame.event.get():
@@ -257,6 +258,7 @@ def pause():
                     two_moving_right = False
                     pause = False
         pygame.display.update()
+    music.set_volume(1)
 
 # GROUPS
 zombie_group = pygame.sprite.Group()
