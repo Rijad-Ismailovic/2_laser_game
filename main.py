@@ -236,6 +236,9 @@ def pause():
     global two_moving_left, two_moving_right, two_moving_up, two_moving_down
 
     help_text = font.render("PAUSED", True, WHITE)
+    paused_img = pygame.image.load("misc/paused_img.png")
+    screen.blit(paused_img, (0, 0))
+    
     pause = True
     while pause:
         for event in pygame.event.get():
@@ -253,7 +256,6 @@ def pause():
                     two_moving_left = False
                     two_moving_right = False
                     pause = False
-        screen.blit(help_text, (440, 200))
         pygame.display.update()
 
 # GROUPS
