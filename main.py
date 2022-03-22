@@ -278,6 +278,9 @@ def getHighscore():
         highscore = score
     return highscore
 
+def setScoree():
+    global score
+    score = 0
 # ----------------------------------------------------- MAIN ----------------------------------------------------------
 
 clock = pygame.time.Clock()
@@ -293,6 +296,7 @@ def game():
     max_zombie_timer = 300
     zombie_timer = 0  # 5 sekundi jer 300/FPS = 5, FPS = 60
     score = 0
+    setScoree()
     tutorial_timer = 300
 
     global one_moving_left, one_moving_right, one_moving_up, one_moving_down
