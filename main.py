@@ -1,4 +1,4 @@
-import pygame
+import pygame, sys
 from pygame import mixer
 import random
 import math
@@ -218,6 +218,7 @@ def gameover():
             screen.blit(button_exit_hover, (550, 550))
             if click:
                 pygame.exit()
+                sys.exit()
         click = False
 
         for event in pygame.event.get():
@@ -454,12 +455,14 @@ def main_menu():
         if button_exit_rect.collidepoint((mx, my)):
             screen.blit(button_exit_hover, (550, 400))
             if click:
-                pygame.exit()
+                pygame.quit()
+                sys.exit()
         click = False
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+                sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
