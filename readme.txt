@@ -8,3 +8,5 @@ This game has no ending, it is an arcade game so it goes on to infinity.
 To play the game, run the "Laser Bound" file. I made it a shortcut for ease of use.
 
 Enjoy !!
+
+![alt text](https://github.com/Rijad-Ismailovic/Laser-Bound/edit/master/lb1.jpg?raw=true)
