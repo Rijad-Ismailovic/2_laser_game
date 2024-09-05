@@ -9,4 +9,6 @@ To play the game, run the "Laser Bound" file. I made it a shortcut for ease of u
 
 Enjoy !!
 
-![alt text](https://github.com/Rijad-Ismailovic/Laser-Bound/edit/master/lb1.png?raw=true)
+![alt text](https://github.com/Rijad-Ismailovic/Laser-Bound/blob/master/misc/lb1.png?raw=true)
+
+https://github.com/Rijad-Ismailovic/Laser-Bound/blob/master/misc/lb1.png?raw=true
